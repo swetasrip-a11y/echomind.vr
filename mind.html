@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EchoMind VR - Enhanced Emotional Mirror</title>
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <style>
+    body { 
+      margin: 0; 
+      font-family: 'Arial', sans-serif; 
+      overflow: hidden; 
+      background: linear-gradient(135deg, #1a1a2e, #16213e);
+    }
+    
+    /* Enhanced mood selection panel */
+    #moodPanel {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(15, 15, 35, 0.9);
+      backdrop-filter: blur(10px);
+      padding: 20px;
+      border-radius: 16px;
+      color: white;
+      z-index: 10;
+      width: 280px;
+      font-size: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+    
+    #moodPanel h3 {
+      margin: 0 0 15px 0;
+      color: #64b5f6;
+      text-align: center;
+      font-weight: 300;
+    }
+    
+    #moodPanel select, #moodPanel button {
+      margin-top: 12px;
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 14px;
+      transition: all 0.3s ease;
+    }
+    
+    #moodPanel select {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    #moodPanel button {
+      background: linear-gradient(45deg, #ff6b6b, #ffa726);
+      color: white;
+      cursor: pointer;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border: none;
+    }
+    
+    #moodPanel button:hover { 
+      background: linear-gradient(45deg, #ff8a80, #ffcc02);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+    }
+    
+    /* Floating particles */
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      pointer-events: none;
+      animation: float 6s infinite ease-in-out;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+      50% { transform: translateY(-20px) rotate(180deg); opacity: 0.8; }
+    }
+    
+    /* Instructions */
+    #instructions {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      text-align: center;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 14px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Floating particles for ambiance -->
+<div class="particle" style="top: 10%; left: 15%; animation-delay: 0s;"></div>
+<div class="particle" style="top: 20%; left: 80%; animation-delay: 1s;"></div>
+<div class="particle" style="top: 60%; left: 25%; animation-delay: 2s;"></div>
+<div class="particle" style="top: 80%; left: 70%; animation-delay: 3s;"></div>
+<div class="particle" style="top: 40%; left: 90%; animation-delay: 4s;"></div>
+
+<!-- Enhanced Mood Selection -->
+<div id="moodPanel">
+  <h3>✨ Emotional Mirror ✨</h3>
+  <label>How are you feeling right now?</label>
+  <select id="moodSelect">
+    <option value="">Choose your emotion...</option>
+    <option value="happy">😊 Happy & Joyful</option>
+    <option value="sad">😢 Sad & Reflective</option>
+    <option value="anxious">😟 Anxious & Worried</option>
+    <option value="excited">🎉 Excited & Energetic</option>
+    <option value="peaceful">🧘 Calm & Peaceful</option>
+    <option value="frustrated">😤 Frustrated & Tense</option>
+  </select>
+  <button onclick="updateMirror()">Reflect My Emotion</button>
+</div>
+
+<!-- Instructions -->
+<div id="instructions">
+  Move with WASD keys • Look around with mouse • Select an emotion above to transform your mirror
+</div>
+
+<!-- Enhanced VR Scene -->
+<a-scene embedded style="height: 100vh; width: 100vw;">
+  <!-- Assets -->
+  <a-assets>
+    <!-- Custom shaders would go here in a real implementation -->
+  </a-assets>
+  
+  <!-- Enhanced Mirror with Frame -->
+  <a-entity id="mirrorFrame" position="0 1.6 -4">
+    <!-- Ornate mirror frame -->
+    <a-ring id="mirrorBorder" 
+            position="0 0 -0.01" 
+            radius-inner="1.4" 
+            radius-outer="1.6" 
+            color="#2a2a2a" 
+            metalness="0.9" 
+            roughness="0.1">
+    </a-ring>
+    
+    <!-- Main mirror surface -->
+    <a-circle id="mirror" 
+              position="0 0 0" 
+              radius="1.4" 
+              color="#e0e0e0" 
+              metalness="0.95" 
+              roughness="0.05"
+              opacity="0.9">
+    </a-circle>
+    
+    <!-- Reflection effect overlay -->
+    <a-circle id="mirrorOverlay" 
+              position="0 0 0.01" 
+              radius="1.35" 
+              color="#ffffff" 
+              opacity="0.1">
+    </a-circle>
+  </a-entity>
+  
+  <!-- Enhanced Affirmation Text with Background -->
+  <a-entity id="affirmationBg" 
+            position="0 3.2 -3.8"
+            geometry="primitive: plane; width: 4; height: 0.8"
+            material="color: #000; opacity: 0.6"
+            visible="false">
+  </a-entity>
+  
+  <a-entity id="affirmation" 
+            text="value:; align: center; width: 6; color: #fff; wrapCount: 40; font: dejavu;"
+            position="0 3.2 -3.7">
+  </a-entity>
+  
+  <!-- Ambient particles around mirror -->
+  <a-entity id="particles" position="0 1.6 -4">
+    <a-sphere position="2 1 0" radius="0.05" color="#ffeb3b" opacity="0.6" 
+              animation="property: position; to: 2 2 0; dir: alternate; loop: true; dur: 3000"></a-sphere>
+    <a-sphere position="-2 0.5 0" radius="0.05" color="#e91e63" opacity="0.6" 
+              animation="property: position; to: -2 1.5 0; dir: alternate; loop: true; dur: 4000"></a-sphere>
+    <a-sphere position="1.5 -0.8 0" radius="0.05" color="#2196f3" opacity="0.6" 
+              animation="property: position; to: 1.5 0.2 0; dir: alternate; loop: true; dur: 3500"></a-sphere>
+    <a-sphere position="-1.8 -0.5 0" radius="0.05" color="#4caf50" opacity="0.6" 
+              animation="property: position; to: -1.8 0.5 0; dir: alternate; loop: true; dur: 2800"></a-sphere>
+  </a-entity>
+  
+  <!-- Enhanced Environment -->
+  <a-sky color="#0f0f23" 
+         animation="property: color; to: #1a1a2e; dir: alternate; loop: true; dur: 10000">
+  </a-sky>
+  
+  <!-- Floor with subtle pattern -->
+  <a-plane position="0 0 -4" 
+           rotation="-90 0 0" 
+           width="10" 
+           height="10" 
+           color="#1a1a1a" 
+           roughness="0.8">
+  </a-plane>
+  
+  <!-- Enhanced Lighting -->
+  <a-light type="ambient" intensity="0.4" color="#404080"></a-light>
+  <a-light type="point" position="0 4 -2" intensity="1.5" color="#ffccaa"></a-light>
+  <a-light type="point" position="3 2 -5" intensity="0.8" color="#ccaaff"></a-light>
+  <a-light type="point" position="-3 2 -5" intensity="0.8" color="#aaffcc"></a-light>
+  
+  <!-- Enhanced Camera with controls -->
+  <a-entity id="cameraRig" position="0 1.6 0">
+    <a-camera look-controls="pointerLockEnabled: true" 
+              wasd-controls="acceleration: 20"
+              position="0 0 0">
+    </a-camera>
+  </a-entity>
+</a-scene>
+
+<script>
+  const emotionData = {
+    happy: {
+      color: "#FFD700",
+      overlayColor: "#FFF59D",
+      message: "Your happiness radiates like sunshine! ✨ Keep shining bright and sharing that beautiful energy! 😄",
+      animation: "property: rotation; to: 0 360 0; loop: true; dur: 6000; easing: easeInOutQuad",
+      skyColor: "#2E7D32",
+      particles: true
+    },
+    sad: {
+      color: "#1976D2",
+      overlayColor: "#90CAF9",
+      message: "It's okay to feel sad. 💙 Your emotions are valid. Take time to heal and be gentle with yourself.",
+      animation: "property: position; to: 0 1.4 0; dir: alternate; loop: true; dur: 4000; easing: easeInOutSine",
+      skyColor: "#1A237E",
+      particles: false
+    },
+    anxious: {
+      color: "#7B1FA2",
+      overlayColor: "#CE93D8",
+      message: "Breathe deeply and slowly. 💜 You are safe, you are capable, and this feeling will pass. You've got this!",
+      animation: "property: scale; to: 1.05 1.05 1; dir: alternate; loop: true; dur: 1500; easing: easeInOutQuad",
+      skyColor: "#4A148C",
+      particles: true
+    },
+    excited: {
+      color: "#FF5722",
+      overlayColor: "#FFAB91",
+      message: "Your excitement is contagious! 🎉 Channel that amazing energy into something wonderful!",
+      animation: "property: rotation; to: 0 0 360; loop: true; dur: 2000; easing: easeInOutBack",
+      skyColor: "#BF360C",
+      particles: true
+    },
+    peaceful: {
+      color: "#4CAF50",
+      overlayColor: "#A5D6A7",
+      message: "Your inner peace is a gift to the world. 🧘 Stay centered and let tranquility flow through you.",
+      animation: "property: position; to: 0 1.8 0; dir: alternate; loop: true; dur: 8000; easing: easeInOutSine",
+      skyColor: "#1B5E20",
+      particles: false
+    },
+    frustrated: {
+      color: "#F44336",
+      overlayColor: "#FFCDD2",
+      message: "Frustration is temporary. 😤 Take a deep breath, step back, and remember your strength and resilience.",
+      animation: "property: rotation; to: 5 0 -5; dir: alternate; loop: true; dur: 1000; easing: easeInOutQuad",
+      skyColor: "#B71C1C",
+      particles: true
+    }
+  };
+
+  function updateMirror() {
+    const mood = document.getElementById("moodSelect").value;
+    const mirror = document.getElementById("mirror");
+    const mirrorOverlay = document.getElementById("mirrorOverlay");
+    const affirmation = document.getElementById("affirmation");
+    const affirmationBg = document.getElementById("affirmationBg");
+    const sky = document.querySelector("a-sky");
+    const particles = document.getElementById("particles");
+    
+    if (!mood || !emotionData[mood]) {
+      // Reset to default
+      mirror.setAttribute("color", "#e0e0e0");
+      mirrorOverlay.setAttribute("color", "#ffffff");
+      affirmation.setAttribute("text", "value", "");
+      affirmationBg.setAttribute("visible", false);
+      mirror.removeAttribute("animation");
+      sky.setAttribute("color", "#0f0f23");
+      particles.setAttribute("visible", false);
+      return;
+    }
+    
+    const emotion = emotionData[mood];
+    
+    // Update mirror appearance
+    mirror.setAttribute("color", emotion.color);
+    mirrorOverlay.setAttribute("color", emotion.overlayColor);
+    
+    // Update affirmation
+    affirmation.setAttribute("text", "value", emotion.message);
+    affirmationBg.setAttribute("visible", true);
+    
+    // Update animation
+    mirror.removeAttribute("animation");
+    setTimeout(() => {
+      mirror.setAttribute("animation", emotion.animation);
+    }, 100);
+    
+    // Update environment
+    sky.setAttribute("color", emotion.skyColor);
+    particles.setAttribute("visible", emotion.particles);
+    
+    // Add some haptic-like visual feedback
+    const mirrorFrame = document.getElementById("mirrorFrame");
+    mirrorFrame.setAttribute("animation__scale", "property: scale; to: 1.1 1.1 1.1; dur: 300; dir: alternate; loop: 1");
+  }
+  
+  // Initialize scene
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add some initial ambiance
+    setTimeout(() => {
+      const sky = document.querySelector("a-sky");
+      sky.setAttribute("animation", "property: color; to: #1a1a2e; dir: alternate; loop: true; dur: 15000");
+    }, 1000);
+  });
+</script>
+
+</body>
+</html>
